@@ -6,7 +6,7 @@ class ApplicationController < Sinatra::Base
   require 'net/http'
   
   require 'dotenv'
-  # require './config/environments'
+  require './config/environments'
 
   Dotenv.load()
 

@@ -3,10 +3,10 @@ class CardController < ApplicationController
 	Bundler.require
 
 	# db connection
-	ActiveRecord::Base.establish_connection(
-		:adapter => 'postgresql',
-		:database => 'cards'
-	)
+	# ActiveRecord::Base.establish_connection(
+	# 	:adapter => 'postgresql',
+	# 	:database => 'cards'
+	# )
 
 
 

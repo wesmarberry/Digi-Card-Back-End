@@ -5,7 +5,8 @@ require './controllers/ApplicationController'
 require './controllers/UserController'
 require './controllers/CardController'
 # models
-
+require './models/UserModel'
+require './models/CardModel'
 # top level routing (specify which controllers to use)
 map ('/') {
 	run ApplicationController
