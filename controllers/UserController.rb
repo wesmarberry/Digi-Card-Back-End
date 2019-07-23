@@ -43,7 +43,35 @@ class UserController < ApplicationController
 		end
 	end
 
-	
+	post '/login' do
+		user = User.find_by username: params[:username]
+		pw = params[:password]
+		if user && user.authenticate(pw)
+			content_type :json
+			session[:logged] = true
+			session[:username] = user[:name]
+			session[:user_id] = user[:id]
+			session[:search] = 0
+			session[:logged] = true
+			session[:message] = {
+				success: true,
+				message: "#{user.username} has successfully logged in!"
+			}
+			data = {
+				:status => 200,
+				:user => user,
+				:message => "#{user.username} has successfully logged in!"
+			}
+			data.to_json
+		else
+			session[:attempted_log] = true
+			data = {
+				:status => 400,
+				:message => "#{user.username} has successfully logged in!"
+			}
+			data.to_json
+		end
+	end
 
 
 
