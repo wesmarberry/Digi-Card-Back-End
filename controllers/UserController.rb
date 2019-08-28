@@ -17,14 +17,19 @@ class UserController < ApplicationController
 
 	post '/register' do 
 
-		user = User.find_by username: params[:username]
+		request.body.rewind
+		request_payload = JSON.parse request.body.read
+		puts 'this is request payload'
+		puts request_payload["username"]
+		user = User.find_by username: request_payload["username"]
 
 		if !user
 			
 			content_type :json
 			user = User.new
-			user.username = params[:username]
-			user.password = params[:password]
+			user.username = request_payload["username"]
+			user.password = request_payload["password"]
+			user.email = request_payload["email"]
 			user.save
 				session[:logged] = true
 				session[:username] = user.username
@@ -34,18 +39,33 @@ class UserController < ApplicationController
 					success: true,
 					message: "#{user.username} has successfully logged in!"
 			}
-			{ :username => user.username}.to_json
+			data = {
+				:status => 200,
+				:user => user,
+				:message => "#{user.username} has successfully registered!"
+			}
+			data.to_json
 		else
 			session[:attempted_reg] = true
 			content_type :json
-    		{ :message => 'failed to register'}.to_json
+    		data = {
+				:status => 400,
+				:message => "failed to register"
+			}
+			data.to_json
 
 		end
 	end
 
 	post '/login' do
-		user = User.find_by username: params[:username]
-		pw = params[:password]
+		
+		request.body.rewind
+		request_payload = JSON.parse request.body.read
+		puts 'this is request payload'
+		puts request_payload["username"]
+		user = User.find_by username: request_payload["username"]
+		puts user
+		pw = request_payload["password"]
 		if user && user.authenticate(pw)
 			content_type :json
 			session[:logged] = true
@@ -67,7 +87,7 @@ class UserController < ApplicationController
 			session[:attempted_log] = true
 			data = {
 				:status => 400,
-				:message => "#{user.username} has successfully logged in!"
+				:message => "Invalid Credentials"
 			}
 			data.to_json
 		end
@@ -75,10 +95,47 @@ class UserController < ApplicationController
 
 
 
+	get '/' do 
+		content_type :json
+		all_users = User.all
+		data = {
+			:status => 200,
+			:users => all_users
+		}
+		data.to_json
+	end
 
+	get '/:id' do
+		user = User.find(params[:id])
+		puts user
+		data = {
+			:status => 200,
+			:user => user
+		}
+		data.to_json
+	end
 
-	
+	put '/:id' do
+		user = User.find(params[:id])
+		user.username = params[:username]
+		user.first_name = params[:first_name]
+		user.last_name = params[:last_name]
+		user.email = params[:email]
+		user.website = params[:website]
+		user.photo = params[:photo]
+		user.linkedin = params[:linkedin]
+		user.github = params[:github]
+		user.phone = params[:phone]
+		user.background = params[:background]
 
+		user.save
+		data = {
+			:status => 200,
+			:user => user,
+			:message => "{#{user.username} has bee updated"
+		}
+		data.to_json
+	end
 
 
 
